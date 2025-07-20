@@ -1,9 +1,7 @@
-# 📦 Streamlit App Starter Kit 
-```
-⬆️ (Replace above with your app's name)
-```
+# 📦 Multi Dataset Yolo V8 Model for Weed Detection 
 
-Description of the app ...
+
+This application utilize Multi Dataset to train a Yolo V8 Model for Weed Detection in agricultural feed to counter the issue of unavailability of diverse dataset in weed detection.
 
 ## Demo App
 
