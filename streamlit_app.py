@@ -21,12 +21,12 @@ def load_yolov8_model(model_id: str, filename: str = "best.pt"):
         st.stop() # Stop the app if model loading fails
 
 # Your specific Hugging Face model ID and filename
-YOLOV8_MODEL_ID = "blurerjr/yolov8_cd"
+YOLOV8_MODEL_ID = "Rohankumar31/Yolo-weed-detection"
 MODEL_FILENAME = "best.pt"
 
 # Load the model
 model = load_yolov8_model(YOLOV8_MODEL_ID, MODEL_FILENAME)
-
+#blurerjr/yolov8_cd
 # Get class names from the model
 class_names = model.names
 # The model summary shows two classes: 'crop' and 'weed'
