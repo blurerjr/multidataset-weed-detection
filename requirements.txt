@@ -1,8 +1,7 @@
-streamlit>=1.17.0 # Or you can pick a specific version like streamlit==1.20.0
-ultralytics==8.3.168
+streamlit
+ultralytics==8.3.168 # It's good to pin this version based on your training
 Pillow
 torch
 numpy
 huggingface_hub
 opencv-python-headless
-pandas
