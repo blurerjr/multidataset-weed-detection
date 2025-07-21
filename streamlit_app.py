@@ -1,66 +1,90 @@
 import streamlit as st
 from PIL import Image
 import io
+import torch
 import numpy as np
-import time
 
-# Move st.set_page_config() to the very top
-st.set_page_config(page_title="Weed Detection with YOLOv8", layout="wide", icon="🌿")
-
-# Ensure necessary libraries are available
-try:
-    import cv2 # headless should be installed via requirements.txt
-except ImportError:
-    st.error("OpenCV is not installed. Please ensure 'opencv-python-headless' is in your requirements.txt.")
-    st.stop()
-
-# --- Configuration ---
-# Your specific Hugging Face model ID and filename
-YOLOV8_MODEL_ID = "blurerjr/yolov8_cd"
-MODEL_FILENAME = "best.pt"
-
-# Initial values for sliders (matching your HTML defaults)
-DEFAULT_CONF_THRESHOLD = 0.5
-DEFAULT_IOU_THRESHOLD = 0.5
+# Assuming you're using Ultralytics for YOLOv8
+from ultralytics import YOLO
+from huggingface_hub import hf_hub_download
 
 # --- Model Loading ---
 @st.cache_resource # Cache the model to avoid reloading on every rerun
-def load_yolov8_model(model_id: str, filename: str):
+def load_yolov8_model(model_id: str, filename: str = "best.pt"):
     """Loads a YOLOv8 model from Hugging Face Hub."""
     try:
-        # No Streamlit widgets directly inside this cached function.
-        # Messages about loading should be displayed OUTSIDE this function call.
         model_path = hf_hub_download(repo_id=model_id, filename=filename)
         model = YOLO(model_path)
         return model
     except Exception as e:
-        # If an error happens here, the app would likely already be stopped by a preceding st.error
-        raise e # Re-raise the error so it can be caught and displayed by Streamlit
+        st.error(f"Error loading model from Hugging Face Hub: {e}")
+        st.stop() # Stop the app if model loading fails
 
-# Display model loading messages before calling the cached function
-with st.spinner(f"Downloading model from Hugging Face Hub: {YOLOV8_MODEL_ID}/{MODEL_FILENAME}"):
-    try:
-        model = load_yolov8_model(YOLOV8_MODEL_ID, MODEL_FILENAME)
-        st.success("Model loaded successfully!")
-    except Exception as e:
-        st.error(f"Error loading model: {e}")
-        st.stop()
+# Your specific Hugging Face model ID and filename
+YOLOV8_MODEL_ID = "blurerjr/yolov8_cd"
+MODEL_FILENAME = "best.pt"
 
+# Load the model
+model = load_yolov8_model(YOLOV8_MODEL_ID, MODEL_FILENAME)
 
-class_names = model.names # Get class names from the model (e.g., 'crop', 'weed')
-
+# Get class names from the model
+class_names = model.names
+# The model summary shows two classes: 'crop' and 'weed'
+# You can verify this by printing model.names locally
 
 # --- Streamlit UI ---
-# Your custom CSS and markdown should also come after set_page_config
+st.set_page_config(page_title="YOLOv8 Weed Detection", layout="wide")
+st.title("🌿 YOLOv8 Weed Detection App")
+st.write("Upload an image to detect crops and weeds using your custom YOLOv8 model.")
+
+uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
+
+if uploaded_file is not None:
+    # Display the uploaded image
+    image = Image.open(uploaded_file)
+    st.image(image, caption='Uploaded Image', use_column_width=True)
+    st.write("")
+    st.write("Detecting crops and weeds...")
+
+    # Convert PIL Image to a format YOLOv8 can use (e.g., numpy array)
+    img_array = np.array(image)
+
+    # Perform inference
+    # You might want to adjust confidence threshold (conf) or IoU threshold (iou)
+    # based on your model's performance.
+    results = model(img_array, conf=0.25, iou=0.45) # Example thresholds
+
+    # Process and display results
+    # The 'results' object from Ultralytics YOLO has various methods for visualization
+    detection_made = False
+    for r in results:
+        # Plotting results directly on the image
+        im_bgr = r.plot()  # plot a BGR numpy array of predictions
+        im_rgb = Image.fromarray(im_bgr[..., ::-1]) # Convert BGR to RGB for Streamlit
+        st.image(im_rgb, caption='Detection Results', use_column_width=True)
+
+        # Display text details of detections
+        if r.boxes:
+            detection_made = True
+            st.subheader("Detected Objects:")
+            for box in r.boxes:
+                conf = box.conf[0].item() # Confidence score
+                cls = int(box.cls[0].item()) # Class ID
+                name = class_names[cls] # Class name (e.g., 'crop' or 'weed')
+                
+                # Get bounding box coordinates for potential further use
+                # x1, y1, x2, y2 = box.xyxy[0].tolist() 
+                
+                st.write(f"- **{name.capitalize()}**: Confidence: {conf:.2f}")
+    
+    if not detection_made:
+        st.write("No crops or weeds detected with the current confidence threshold.")
+
+
+else:
+    st.info("Please upload an image to get started with weed detection.")
+
 st.markdown("""
-<style>
-.stApp {
-    background-color: #f8fafc; /* bg-gray-50 */
-}
-# ... (rest of your CSS and UI code) ...
-""", unsafe_allow_html=True)
-
-st.header("Weed Detection with YOLOv8", divider="gray")
-st.markdown("Upload images or use your camera with our fine-tuned YOLOv8 weed detection model")
-
-# ... (rest of your Streamlit app code) ...
+---
+*Disclaimer: This app is for demonstration purposes only and may not be 100% accurate for all scenarios. The model detects 'crop' and 'weed' categories.*
+""")
