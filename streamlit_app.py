@@ -21,7 +21,7 @@ def load_yolov8_model(model_id: str, filename: str = "best.pt"):
         st.stop() # Stop the app if model loading fails
 
 # Your specific Hugging Face model ID and filename
-YOLOV8_MODEL_ID = "Rohankumar31/Yolo-weed-detection"
+YOLOV8_MODEL_ID = "lurerjr/yolov8_cd"
 MODEL_FILENAME = "best.pt"
 
 # Load the model
