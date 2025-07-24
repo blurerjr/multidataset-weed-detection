@@ -5,7 +5,7 @@ This application utilize Multi Dataset to train a Yolo V8 Model for Weed Detecti
 
 ## Demo App
 
-[![Streamlit App]([https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://app-starter-kit.streamlit.app/](https://yolov8-weed-detection.streamlit.app/))
+[![Streamlit App](https://yolov8-weed-detection.streamlit.app/)
 
 ## GitHub Codespaces
 
