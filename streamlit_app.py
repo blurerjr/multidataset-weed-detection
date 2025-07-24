@@ -71,7 +71,7 @@ if detection_mode == "Image":
         image = Image.open(uploaded_file)
         img_array = np.array(image)
         
-        st.image(image, caption="Uploaded Image", use_column_width=True)
+        st.image(image, caption="Uploaded Image", use_container_width=True)
         
         if st.button("Detect Weeds & Crops"):
             with st.spinner("Processing image..."):
@@ -103,7 +103,7 @@ if detection_mode == "Image":
                         cv2.rectangle(annotated_img_array, (x1, y1 - h - 5), (x1 + w, y1), color, -1)
                         cv2.putText(annotated_img_array, label, (x1, y1 - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
 
-                st.image(annotated_img_array, caption="Processed Image", use_column_width=True)
+                st.image(annotated_img_array, caption="Processed Image", use_container_width=True)
                 st.success(f"Detection complete! Found {detection_count['crop']} crops and {detection_count['weed']} weeds.")
 
 # --- Video Detection Logic ---
@@ -151,7 +151,7 @@ elif detection_mode == "Video":
                         cv2.putText(annotated_frame, label, (x1, y1 - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
 
                 # Display the annotated frame
-                stframe.image(annotated_frame, channels="BGR", use_column_width=True)
+                stframe.image(annotated_frame, channels="BGR", use_container_width=True)
             
             cap.release()
             tfile.close()
