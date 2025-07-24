@@ -1,7 +1,5 @@
 streamlit
-ultralytics==8.3.168 # It's good to pin this version based on your training
-Pillow
-torch
-numpy
-huggingface_hub
 opencv-python-headless
+ultralytics
+requests
+Pillow
